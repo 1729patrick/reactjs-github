@@ -1,28 +1,73 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import AppContainer from './components/app-container'
+import ajax from '@fdaciuk/ajax'
 
 class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
-    );
-  }
+
+    constructor(){
+        super()
+        this.state = {
+            userInfo: null,
+            repos: [],
+            starred: [],
+            isFetching: false
+        }
+    }
+
+    handleSearch = (e)=> {
+        const value = e.target.value
+        const key = e.which || e.keyCode
+        const ENTER = 13
+
+        if(key === ENTER ){
+            this.setState({isFetching: true})
+
+            ajax().get(this.getGitHubApi(value)).then(res => {
+                this.setState({
+                    userInfo: {
+                        username: res.name,
+                        image: res.avatar_url,
+                        login: res.login,
+                        repos: res.public_repos,
+                        followers: res.followers,
+                        following: res.following
+                    },
+                    repos: [],
+                    starred: []
+                })
+
+            }).always(()=> {this.setState({isFetching: false})})
+        }
+    }
+
+    handleAction = (action) => {
+        return () => {
+            const {login} = this.state.userInfo
+            ajax().get(this.getGitHubApi(login, action)).then(res => {
+                this.setState({
+                    [action]: res.map(r => ({
+                            link: r.html_url,
+                            name: r.name,
+                            id: r.id
+                        })
+                    )
+                })
+            })
+        }
+    }
+
+    getGitHubApi = (login, action) => {
+        const internalAction = action? `/${action}`: ''
+        return `https://api.github.com/users/${login}${internalAction}`
+    }
+
+    render() {
+        return <AppContainer
+            {...this.state}
+            handleSearch={this.handleSearch}
+            handleAction={this.handleAction}
+        />
+    }
 }
 
 export default App;
