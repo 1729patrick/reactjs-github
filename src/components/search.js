@@ -1,20 +1,23 @@
-import React from 'react'
-import PropTypes from 'prop-types'
+import React from 'react';
+import PropTypes from 'prop-types';
 
 const Search = ({ handleSearch, isDisabled }) => (
 
-  <div className='search'>
-    <input className='shadow' type='search'
-      placeholder='Nome do usuário'
+  <div className="search">
+    <input
+      className="shadow"
+      type="search"
+      placeholder="Nome do usuário"
       autoFocus
       disabled={isDisabled}
-      onKeyUp={handleSearch} />
+      onKeyUp={handleSearch}
+    />
   </div>
 
-)
+);
 
-export default Search
+export default Search;
 Search.propTypes = {
   handleSearch: PropTypes.func.isRequired,
-  isDisabled: PropTypes.bool.isRequired
-}
+  isDisabled: PropTypes.bool.isRequired,
+};
